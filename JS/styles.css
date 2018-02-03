@@ -1,0 +1,35 @@
+.board{
+    margin: auto;
+    width: 50%;
+    height: 50%;
+}
+
+.cell{
+    position: relative;
+    background-color: whitesmoke;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+}
+
+.wall {
+    background-color: gray;
+}
+
+.position{
+    background:#ffff00;
+    border: 1px solid #000;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    /*Centering v and h*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+}
+
+.destination{
+    background-color: #ff0000;
+    opacity: 0.5;
+}
