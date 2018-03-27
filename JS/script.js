@@ -12,8 +12,30 @@ window.onload = () =>{
     startingPoint.append(positioner)
     startingPoint.dataset.isStartPoint = true
 
-        //Add event listener
+    //Add event listener
     const cells =  document.querySelectorAll('.cell')
+
+    //Calc Adjacent cells
+    const cellWithAdj = Array.from(cells).map(cell => {
+        const adjacent =  []
+        const cellAdj = Array.from(cells).filter(destination => {
+            const isWall = destination.classList.contains('wall')
+            const adjTop = parseInt(cell.dataset.col,10) === parseInt(destination.dataset.col,10) && parseInt(cell.dataset.row,10) + 1 === parseInt(destination.dataset.row, 10)
+            const adjDown = parseInt(cell.dataset.col,10) === parseInt(destination.dataset.col,10) && parseInt(cell.dataset.row,10) - 1  === parseInt(destination.dataset.row, 10)
+            const adjRight = parseInt(cell.dataset.row,10) === parseInt(destination.dataset.row,10) && parseInt(cell.dataset.col,10) + 1 === parseInt(destination.dataset.col, 10)
+            const adjLeft = parseInt(cell.dataset.row,10) === parseInt(destination.dataset.row,10) && parseInt(cell.dataset.col,10) - 1  === parseInt(destination.dataset.col, 10)
+
+           if(!isWall && (adjDown|| adjLeft|| adjRight|| adjTop)){
+            adjacent.push(destination)
+            return destination
+           } 
+           return
+        })   
+        
+        cell.dataset.adjacent = adjacent
+
+        return cell
+    })
     
     //Destination class
     let destinationCell = startingPoint
@@ -23,41 +45,48 @@ window.onload = () =>{
             cell.classList.add('destination')
             destinationCell = cell
 
-            routeFinding(null, startingPoint, destinationCell, 1)
-            //Moveball()
+            bfs(cellWithAdj, destinationCell)
+            //moveBall()
         });
     });
 
-    const routeFinding = (father,startingPoint, destination, index) => {
-        //Cells 
-        console.log(destination)
-        if(destination.dataset.isStartPoint) return
-        //console.log("DESTINATION",destination)
-        const adjacents = Array.from(cells).filter(cell => {
-            const isWall = cell.classList.contains('wall')
-            const adjTop = parseInt(cell.dataset.col,10) === parseInt(destination.dataset.col,10) && parseInt(cell.dataset.row,10) + 1 === parseInt(destination.dataset.row, 10)
-            const adjDown = parseInt(cell.dataset.col,10) === parseInt(destination.dataset.col,10) && parseInt(cell.dataset.row,10) - 1  === parseInt(destination.dataset.row, 10)
-            const adjRight = parseInt(cell.dataset.row,10) === parseInt(destination.dataset.row,10) && parseInt(cell.dataset.col,10) + 1 === parseInt(destination.dataset.col, 10)
-            const adjLeft = parseInt(cell.dataset.row,10) === parseInt(destination.dataset.row,10) && parseInt(cell.dataset.col,10) - 1  === parseInt(destination.dataset.col, 10)
-            
-            const isAdj = !isWall && (adjDown|| adjLeft|| adjRight|| adjTop) && cell !== father &&  !cell.dataset.weight 
-            //console.log("ADJACENT",cell.dataset, isAdj)
-            return isAdj
-        })
-
-        console.log("\n\n\n",index, '\n\n')
-        console.log(adjacents)
-        const indexMod = index+1
-        adjacents.forEach((adjacent) => {
-            if(!adjacent.dataset.weight){
-                adjacent.dataset.weight = index
-                adjacent.innerHTML = index.toString()
+    
+    //G = set of cells
+    //s destination point
+    const bfs = (G, s) => {
+        //Painting cell
+        G.forEach(cell => {
+            if(cell !== s){
+                cell.dataset.color = "white"
+                cell.classList.add('white')
+                cell.dataset.distance = null
+                cell.dataset.parent = null
             }
-
         })
 
-        adjacents.forEach((adjacent) => {
-            routeFinding(destination, startingPoint,adjacent, indexMod)
-        })        
+        s.dataset.color = "gray"
+        s.classList.add('gray')
+        s.dataset.distance = 0
+        s.dataset.parent = null
+
+        var Q = []
+        Q.push(s)
+
+        while(Q.length !== 0){
+            const u = Q.shift()
+            Array.from(u.dataset.adjacent).forEach(v => {
+                console.log(v)
+                if(v.dataset.color === "white"){
+                    v.dataset.color = "gray"
+                    v.classList.add('gray')
+                    v.dataset.distance = u.dataset.distance + 1
+                    v.dataset.parent = u
+                    Q.push(v)
+                }
+            })
+            u.dataset.color = "black"
+            u.classList.add('black')
+        }
+
     }
 }
