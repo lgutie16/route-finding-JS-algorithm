@@ -6,7 +6,7 @@ window.onload = () =>{
 
         //Positioner
     let positioner = document.createElement('div');
-    positioner.className = 'position';
+    positioner.classList.add('position');
 
         //Place start point
     startingPoint.append(positioner)
@@ -31,7 +31,6 @@ window.onload = () =>{
         })   
         
         adj[cell.dataset.id] = cellAdj
-        console.log(cell.dataset.id, adj)
 
         return cell
     })
@@ -45,7 +44,7 @@ window.onload = () =>{
             destinationCell = cell
 
             bfs(cellWithAdj, destinationCell)
-            //moveBall()
+            moveBall(startingPoint)
         });
     });
 
@@ -64,7 +63,7 @@ window.onload = () =>{
         })
 
         s.dataset.color = "gray"
-        s.classList.add('gray')
+        //s.classList.add('gray')
         s.dataset.distance = 0
         s.dataset.parent = null
 
@@ -74,13 +73,11 @@ window.onload = () =>{
         while(Q.length !== 0){
             const u = Q.shift()
             if(u.dataset.isStartPoint)  Q = []
-            debugger
             Array.from(adj[u.dataset.id]).forEach(v => {
-                debugger
                 if(v.dataset.color === "white"){
                     v.dataset.color = "gray"
                     v.classList.remove('white')
-                    v.classList.add('gray')
+                    //v.classList.add('gray')
                     v.dataset.distance = u.dataset.distance + 1
                     parents[v.dataset.id] = u
                     //v.dataset.parent = u
@@ -88,9 +85,26 @@ window.onload = () =>{
                 }
             })
             u.dataset.color = "black"
-            u.classList.remove('white', 'gray')
-            u.classList.add('black')
+            //u.classList.remove('white', 'gray')
+            //u.classList.add('black')
         }
 
+    }
+
+    const moveBall = (starting) => {
+        debugger
+        if(starting.dataset.id ===  destinationCell.dataset.id){
+            startingPoint = destinationCell
+            return
+        }
+        let newCell = adj[starting.dataset.id] ?  adj[starting.dataset.id][0] : null
+        if(!newCell) return
+        Array.from(adj[starting.dataset.id]).forEach((adjCell) => {
+            newCell = !adjCell.classList.contains('wall') && adjCell.dataset.distance !== null && adjCell.dataset.distance < newCell.dataset.distance ? adjCell : newCell
+        })
+
+
+        newCell.append(positioner)
+        moveBall(newCell)
     }
 }
