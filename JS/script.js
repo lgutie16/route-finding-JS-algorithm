@@ -16,8 +16,10 @@ window.onload = () =>{
     const cells =  document.querySelectorAll('.cell')
 
     //Calc Adjacent cells
+    let adj = {}
+    let parents = {}
     const cellWithAdj = Array.from(cells).map(cell => {
-        const adjacent =  []
+        
         const cellAdj = Array.from(cells).filter(destination => {
             const isWall = destination.classList.contains('wall')
             const adjTop = parseInt(cell.dataset.col,10) === parseInt(destination.dataset.col,10) && parseInt(cell.dataset.row,10) + 1 === parseInt(destination.dataset.row, 10)
@@ -25,14 +27,11 @@ window.onload = () =>{
             const adjRight = parseInt(cell.dataset.row,10) === parseInt(destination.dataset.row,10) && parseInt(cell.dataset.col,10) + 1 === parseInt(destination.dataset.col, 10)
             const adjLeft = parseInt(cell.dataset.row,10) === parseInt(destination.dataset.row,10) && parseInt(cell.dataset.col,10) - 1  === parseInt(destination.dataset.col, 10)
 
-           if(!isWall && (adjDown|| adjLeft|| adjRight|| adjTop)){
-            adjacent.push(destination)
-            return destination
-           } 
-           return
+           if(!isWall && (adjDown|| adjLeft|| adjRight|| adjTop)) return destination
         })   
         
-        cell.dataset.adjacent = adjacent
+        adj[cell.dataset.id] = cellAdj
+        console.log(cell.dataset.id, adj)
 
         return cell
     })
@@ -74,17 +73,21 @@ window.onload = () =>{
 
         while(Q.length !== 0){
             const u = Q.shift()
-            Array.from(u.dataset.adjacent).forEach(v => {
-                console.log(v)
+            debugger
+            Array.from(adj[u.dataset.id]).forEach(v => {
+                debugger
                 if(v.dataset.color === "white"){
                     v.dataset.color = "gray"
+                    v.classList.remove('white')
                     v.classList.add('gray')
                     v.dataset.distance = u.dataset.distance + 1
-                    v.dataset.parent = u
+                    parents[v.dataset.id] = u
+                    //v.dataset.parent = u
                     Q.push(v)
                 }
             })
             u.dataset.color = "black"
+            u.classList.remove('white', 'gray')
             u.classList.add('black')
         }
 
