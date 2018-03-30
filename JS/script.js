@@ -73,6 +73,7 @@ window.onload = () =>{
 
         while(Q.length !== 0){
             const u = Q.shift()
+            if(u.dataset.isStartPoint)  Q = []
             debugger
             Array.from(adj[u.dataset.id]).forEach(v => {
                 debugger
